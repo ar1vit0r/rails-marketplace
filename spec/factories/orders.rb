@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :order do
-    user { nil }
-    status { "MyString" }
-    total { "9.99" }
+    status { "pending" }
+    total { 0 }
+    user
   end
 end
