@@ -1,20 +1,20 @@
-<h1 class="text-2xl font-bold text-gray-900 mb-6">Products</h1>
+<h1 class="text-2xl font-bold text-gray-100 mb-6">Products</h1>
 
 <%= form_with url: products_path, method: :get, class: "flex gap-4 mb-6" do |f| %>
-  <%= f.text_field :q, placeholder: "Search...", value: params[:q], class: "border rounded-lg px-4 py-2 w-64" %>
-  <%= f.collection_select :category_id, Category.all, :id, :name, { include_blank: "All Categories", selected: params[:category_id] }, class: "border rounded-lg px-4 py-2" %>
-  <%= f.submit "Filter", class: "bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 cursor-pointer" %>
+  <%= f.text_field :q, placeholder: "Search...", value: params[:q], class: "bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 w-64 text-gray-100" %>
+  <%= f.collection_select :category_id, Category.all, :id, :name, { include_blank: "All Categories", selected: params[:category_id] }, class: "bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-gray-100" %>
+  <%= f.submit "Filter", class: "bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700 cursor-pointer" %>
 <% end %>
 
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
   <% @products.each do |product| %>
-    <%= link_to product_path(product), class: "bg-white rounded-lg shadow overflow-hidden hover:shadow-md transition" do %>
-      <div class="h-48 bg-gray-200"></div>
+    <%= link_to product_path(product), class: "bg-gray-800 border border-gray-700 rounded-lg overflow-hidden hover:border-cyan-500 transition" do %>
+      <div class="h-48 bg-gray-700"></div>
       <div class="p-4">
-        <h3 class="font-semibold text-gray-900"><%= product.name %></h3>
-        <p class="text-sm text-gray-500"><%= product.category.name %> | <%= product.user.email %></p>
-        <p class="text-lg font-bold text-indigo-600 mt-2">$<%= number_with_precision(product.price, precision: 2) %></p>
-        <p class="text-sm text-gray-500"><%= product.stock %> in stock</p>
+        <h3 class="font-semibold text-gray-100"><%= product.name %></h3>
+        <p class="text-sm text-gray-400"><%= product.category.name %> | <%= product.user.email %></p>
+        <p class="text-lg font-bold text-cyan-400 mt-2">$<%= number_with_precision(product.price, precision: 2) %></p>
+        <p class="text-sm text-gray-400"><%= product.stock %> in stock</p>
       </div>
     <% end %>
   <% end %>
@@ -22,10 +22,10 @@
 
 <div class="mt-8 flex gap-2">
   <% if @pagy.page > 1 %>
-    <%= link_to "← Previous", products_path(page: @pagy.page - 1, q: params[:q], category_id: params[:category_id]), class: "px-4 py-2 bg-white rounded shadow hover:bg-gray-50" %>
+    <%= link_to "← Previous", products_path(page: @pagy.page - 1, q: params[:q], category_id: params[:category_id]), class: "px-4 py-2 bg-gray-800 border border-gray-700 rounded hover:border-cyan-500 text-gray-300" %>
   <% end %>
-  <span class="px-4 py-2">Page <%= @pagy.page %> of <%= @pagy.pages %></span>
+  <span class="px-4 py-2 text-gray-400">Page <%= @pagy.page %> of <%= @pagy.pages %></span>
   <% if @pagy.page < @pagy.pages %>
-    <%= link_to "Next →", products_path(page: @pagy.page + 1, q: params[:q], category_id: params[:category_id]), class: "px-4 py-2 bg-white rounded shadow hover:bg-gray-50" %>
+    <%= link_to "Next →", products_path(page: @pagy.page + 1, q: params[:q], category_id: params[:category_id]), class: "px-4 py-2 bg-gray-800 border border-gray-700 rounded hover:border-cyan-500 text-gray-300" %>
   <% end %>
 </div>
