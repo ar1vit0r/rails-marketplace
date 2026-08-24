@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Marketplace</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+  <body class="bg-gray-50">
+    <nav class="bg-white shadow">
+      <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+        <%= link_to "Marketplace", root_path, class: "text-xl font-bold text-indigo-600" %>
+        <div class="flex items-center gap-4">
+          <%= link_to "Products", products_path, class: "text-gray-600 hover:text-indigo-600" %>
+          <%= link_to "Categories", categories_path, class: "text-gray-600 hover:text-indigo-600" %>
+          <%= link_to cart_path, class: "text-gray-600 hover:text-indigo-600" do %>
+            Cart (<%= current_cart.item_count %>)
+          <% end %>
+          <% if user_signed_in? %>
+            <% if current_user.admin? %>
+              <%= link_to "Admin", admin_dashboard_path, class: "text-gray-600 hover:text-indigo-600" %>
+            <% end %>
+            <%= button_to "Logout", destroy_user_session_path, method: :delete, class: "text-gray-600 hover:text-indigo-600" %>
+          <% else %>
+            <%= link_to "Login", new_user_session_path, class: "text-gray-600 hover:text-indigo-600" %>
+            <%= link_to "Sign up", new_user_registration_path, class: "bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700" %>
+          <% end %>
+        </div>
+      </div>
+    </nav>
+    <main class="max-w-7xl mx-auto px-4 py-8">
+      <% if notice %>
+        <p class="bg-green-100 text-green-800 px-4 py-2 rounded mb-4"><%= notice %></p>
+      <% end %>
+      <% if alert %>
+        <p class="bg-red-100 text-red-800 px-4 py-2 rounded mb-4"><%= alert %></p>
+      <% end %>
+      <%= yield %>
+    </main>
+  </body>
+</html>
