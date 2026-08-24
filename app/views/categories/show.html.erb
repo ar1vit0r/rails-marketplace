@@ -1,0 +1,25 @@
+<%= link_to "← Back to categories", categories_path, class: "text-indigo-600 hover:underline mb-4 inline-block" %>
+
+<h1 class="text-2xl font-bold text-gray-900 mb-6"><%= @category.name %></h1>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  <% @products.each do |product| %>
+    <%= link_to product_path(product), class: "bg-white rounded-lg shadow overflow-hidden hover:shadow-md transition" do %>
+      <div class="h-48 bg-gray-200"></div>
+      <div class="p-4">
+        <h3 class="font-semibold text-gray-900"><%= product.name %></h3>
+        <p class="text-lg font-bold text-indigo-600 mt-2">$<%= number_with_precision(product.price, precision: 2) %></p>
+      </div>
+    <% end %>
+  <% end %>
+</div>
+
+<div class="mt-8 flex gap-2">
+  <% if @pagy.page > 1 %>
+    <%= link_to "← Previous", category_path(@category, page: @pagy.page - 1), class: "px-4 py-2 bg-white rounded shadow hover:bg-gray-50" %>
+  <% end %>
+  <span class="px-4 py-2">Page <%= @pagy.page %> of <%= @pagy.pages %></span>
+  <% if @pagy.page < @pagy.pages %>
+    <%= link_to "Next →", category_path(@category, page: @pagy.page + 1), class: "px-4 py-2 bg-white rounded shadow hover:bg-gray-50" %>
+  <% end %>
+</div>
