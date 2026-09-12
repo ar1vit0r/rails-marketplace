@@ -10,7 +10,7 @@ class CheckoutController < ApplicationController
     end
 
     session = Stripe::Checkout::Session.create(
-      payment_method_types: ["card"],
+      payment_method_types: [ "card" ],
       line_items: @order.order_items.map { |item|
         {
           price_data: {
