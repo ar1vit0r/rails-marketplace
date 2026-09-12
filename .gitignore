@@ -36,3 +36,7 @@
 
 /app/assets/builds/*
 !/app/assets/builds/.keep
+
+# Claude Code project config/instructions.
+/.claude/
+/CLAUDE.md
