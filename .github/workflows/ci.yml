@@ -33,3 +33,12 @@ jobs:
         run: bundle exec rspec --exclude-pattern "spec/system/**/*"
         env:
           RAILS_ENV: test
+
+      - name: Lint (Rubocop)
+        run: bundle exec rubocop
+
+      - name: Security scan (Brakeman)
+        run: bundle exec brakeman --no-pager
+
+      - name: Dependency audit (bundler-audit)
+        run: bundle exec bundler-audit check --update
