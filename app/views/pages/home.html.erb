@@ -1,28 +1,50 @@
-<div class="text-center mb-8">
-  <h1 class="text-4xl font-bold text-gray-100 mb-2">Discover Amazing Products</h1>
-  <p class="text-gray-400">Shop from our curated collection</p>
-</div>
+<% content_for :head do %>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&display=swap">
+<% end %>
 
-<h2 class="text-xl font-bold text-gray-100 mb-4">Categories</h2>
-<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-  <% @categories.each do |category| %>
-    <%= link_to category_path(category), class: "bg-gray-800 border border-gray-700 rounded-lg p-4 text-center hover:border-cyan-500 transition" do %>
-      <h3 class="font-semibold text-gray-100"><%= category.name %></h3>
-      <p class="text-sm text-gray-400"><%= category.products.count %> products</p>
+<section aria-labelledby="directory-title">
+  <h1 id="directory-title" class="font-display font-bold text-3xl mb-4">What are you shopping for?</h1>
+  <ul class="border-t border-gray-700">
+    <% @categories.each do |category| %>
+      <li class="border-b border-gray-700">
+        <%= link_to category_path(category),
+              style: "--h: #{category_hue(category.id)}",
+              class: "group flex items-center gap-4 md:gap-6 px-2 py-3 md:py-4 hover:bg-plate hover:text-gray-900 focus-visible:bg-plate focus-visible:text-gray-900 motion-safe:transition-colors" do %>
+          <span class="bg-plate size-6 md:size-10 shrink-0"></span>
+          <span class="flex-1 min-w-0 break-words font-display font-black text-6xl md:text-8xl leading-[0.9]"><%= category.name %></span>
+          <span class="text-right text-sm text-gray-400 group-hover:text-gray-900 group-focus-visible:text-gray-900">
+            <span class="hidden md:block"><%= category.description %></span>
+            <%= pluralize(category.products.count, "item") %>
+          </span>
+        <% end %>
+      </li>
     <% end %>
-  <% end %>
-</div>
+  </ul>
+</section>
 
-<h2 class="text-xl font-bold text-gray-100 mb-4">Featured Products</h2>
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-  <% @products.each do |product| %>
-    <%= link_to product_path(product), class: "bg-gray-800 border border-gray-700 rounded-lg overflow-hidden hover:border-cyan-500 transition" do %>
-      <div class="h-48 bg-gray-700"></div>
-      <div class="p-4">
-        <h3 class="font-semibold text-gray-100"><%= product.name %></h3>
-        <p class="text-sm text-gray-400"><%= product.category.name %></p>
-        <p class="text-lg font-bold text-cyan-400 mt-2">$<%= number_with_precision(product.price, precision: 2) %></p>
-      </div>
-    <% end %>
+<section class="mt-16" aria-labelledby="products-title">
+  <div class="flex items-baseline justify-between mb-6">
+    <h2 id="products-title" class="font-display font-black text-4xl">Products</h2>
+    <%= link_to "See all products", products_path, class: "underline underline-offset-4 text-gray-300 hover:text-gray-100" %>
+  </div>
+
+  <% if @products.blank? %>
+    <p class="text-gray-400">No products yet. Check back soon.</p>
+  <% else %>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-x-4 md:gap-x-6 gap-y-8">
+      <% @products.each do |product| %>
+        <%= link_to product_path(product), style: "--h: #{category_hue(product.category_id)}", class: "group block" do %>
+          <div class="bg-plate aspect-square p-3 md:p-4 flex items-end text-gray-900">
+            <span class="font-display font-black text-3xl md:text-4xl leading-[0.95] break-words line-clamp-4 group-hover:underline group-focus-visible:underline decoration-2"><%= product.name %></span>
+          </div>
+          <div class="flex items-baseline justify-between gap-2 mt-2">
+            <span class="text-sm text-gray-400"><%= product.category.name %></span>
+            <span class="font-display font-bold text-xl tabular-nums">$<%= number_with_precision(product.price, precision: 2) %></span>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
   <% end %>
-</div>
+</section>

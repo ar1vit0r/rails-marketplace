@@ -1,15 +1,11 @@
 require 'rails_helper'
 
-# Specs in this file have access to a helper object that includes
-# the PagesHelper. For example:
-#
-# describe PagesHelper do
-#   describe "string concat" do
-#     it "concats two strings with spaces" do
-#       expect(helper.concat_strings("this","that")).to eq("this that")
-#     end
-#   end
-# end
 RSpec.describe PagesHelper, type: :helper do
-  pending "add some examples to (or delete) #{__FILE__}"
+  describe "#category_hue" do
+    it "gives 360 consecutive ids 360 distinct hues within 0..359" do
+      hues = (1..360).map { |id| helper.category_hue(id) }
+      expect(hues).to all(be_between(0, 359))
+      expect(hues.uniq.size).to eq(360)
+    end
+  end
 end
