@@ -5,6 +5,6 @@ class CategoriesController < ApplicationController
 
   def show
     @category = Category.find(params[:id])
-    @pagy, @products = pagy(@category.products.in_stock.includes(:user).order(created_at: :desc), items: 12)
+    @pagy, @products = pagy(@category.products.in_stock.order(created_at: :desc), limit: 12)
   end
 end

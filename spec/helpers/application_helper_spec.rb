@@ -1,6 +1,6 @@
-require 'rails_helper'
+require "rails_helper"
 
-RSpec.describe PagesHelper, type: :helper do
+RSpec.describe ApplicationHelper, type: :helper do
   describe "#category_hue" do
     it "gives 360 consecutive ids 360 distinct hues within 0..359" do
       hues = (1..360).map { |id| helper.category_hue(id) }

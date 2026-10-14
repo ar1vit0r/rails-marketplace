@@ -1,31 +1,49 @@
-<h1 class="text-2xl font-bold text-gray-100 mb-6">Products</h1>
+<h1 class="font-display font-black text-5xl md:text-7xl leading-none">Products</h1>
+<p class="text-gray-400 mt-2 mb-6"><%= pluralize(@pagy.count, "product") %></p>
 
-<%= form_with url: products_path, method: :get, class: "flex gap-4 mb-6" do |f| %>
-  <%= f.text_field :q, placeholder: "Search...", value: params[:q], class: "bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 w-64 text-gray-100" %>
-  <%= f.collection_select :category_id, Category.all, :id, :name, { include_blank: "All Categories", selected: params[:category_id] }, class: "bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-gray-100" %>
-  <%= f.submit "Filter", class: "bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-700 cursor-pointer" %>
+<%= form_with url: products_path, method: :get, class: "flex gap-3 mb-4" do |f| %>
+  <%= f.hidden_field :category_id, value: params[:category_id] if params[:category_id].present? %>
+  <%= f.search_field :q, value: params[:q], placeholder: "Search products", "aria-label": "Search products", class: "flex-1 sm:flex-none sm:w-72 bg-transparent border border-gray-600 px-3 py-2 text-gray-100 placeholder:text-gray-500" %>
+  <%= f.submit "Search", name: nil, class: "bg-gray-100 text-gray-900 font-display font-bold text-lg px-4 py-2 cursor-pointer hover:bg-white" %>
 <% end %>
 
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-  <% @products.each do |product| %>
-    <%= link_to product_path(product), class: "bg-gray-800 border border-gray-700 rounded-lg overflow-hidden hover:border-cyan-500 transition" do %>
-      <div class="h-48 bg-gray-700"></div>
-      <div class="p-4">
-        <h3 class="font-semibold text-gray-100"><%= product.name %></h3>
-        <p class="text-sm text-gray-400"><%= product.category.name %> | <%= product.user.email %></p>
-        <p class="text-lg font-bold text-cyan-400 mt-2">$<%= number_with_precision(product.price, precision: 2) %></p>
-        <p class="text-sm text-gray-400"><%= product.stock %> in stock</p>
-      </div>
+<nav aria-label="Categories" class="flex flex-wrap gap-2 mb-8">
+  <% all_active = params[:category_id].blank? %>
+  <%= link_to "All", products_path(q: params[:q].presence), "aria-current": (all_active ? "true" : nil),
+        class: "px-3 py-1.5 border #{all_active ? 'bg-gray-100 text-gray-900 border-transparent' : 'border-gray-600 text-gray-300 hover:border-gray-300'}" %>
+  <% Category.all.each do |category| %>
+    <% active = params[:category_id].to_s == category.id.to_s %>
+    <%= link_to products_path(q: params[:q].presence, category_id: category.id),
+          style: "--h: #{category_hue(category.id)}", "aria-current": (active ? "true" : nil),
+          class: "inline-flex items-center gap-2 px-3 py-1.5 border #{active ? 'bg-plate text-gray-900 border-transparent' : 'border-gray-600 text-gray-300 hover:border-gray-300'}" do %>
+      <span class="bg-plate size-3"></span><%= category.name %>
     <% end %>
   <% end %>
-</div>
+</nav>
 
-<div class="mt-8 flex gap-2">
-  <% if @pagy.page > 1 %>
-    <%= link_to "← Previous", products_path(page: @pagy.page - 1, q: params[:q], category_id: params[:category_id]), class: "px-4 py-2 bg-gray-800 border border-gray-700 rounded hover:border-cyan-500 text-gray-300" %>
-  <% end %>
-  <span class="px-4 py-2 text-gray-400">Page <%= @pagy.page %> of <%= @pagy.pages %></span>
-  <% if @pagy.page < @pagy.pages %>
-    <%= link_to "Next →", products_path(page: @pagy.page + 1, q: params[:q], category_id: params[:category_id]), class: "px-4 py-2 bg-gray-800 border border-gray-700 rounded hover:border-cyan-500 text-gray-300" %>
-  <% end %>
-</div>
+<% if @products.blank? %>
+  <p class="text-gray-400">
+    No products found.
+    <% if params[:q].present? || params[:category_id].present? %>
+      <%= link_to "Clear filters", products_path, class: "underline underline-offset-4 text-gray-300 hover:text-gray-100" %>
+    <% end %>
+  </p>
+<% else %>
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-x-4 md:gap-x-6 gap-y-8">
+    <% @products.each do |product| %>
+      <%= render "products/plate", product: product %>
+    <% end %>
+  </div>
+<% end %>
+
+<% if @pagy.pages > 1 %>
+  <nav aria-label="Pages" class="mt-10 flex items-center gap-6">
+    <% if @pagy.page > 1 %>
+      <%= link_to "Previous page", products_path(q: params[:q].presence, category_id: params[:category_id].presence, page: @pagy.page - 1), class: "underline underline-offset-4 text-gray-300 hover:text-gray-100" %>
+    <% end %>
+    <span class="text-gray-400">Page <%= @pagy.page %> of <%= @pagy.pages %></span>
+    <% if @pagy.page < @pagy.pages %>
+      <%= link_to "Next page", products_path(q: params[:q].presence, category_id: params[:category_id].presence, page: @pagy.page + 1), class: "underline underline-offset-4 text-gray-300 hover:text-gray-100" %>
+    <% end %>
+  </nav>
+<% end %>

@@ -1,0 +1,9 @@
+<%= link_to product_path(product), style: "--h: #{category_hue(product.category_id)}", class: "group block" do %>
+  <div class="bg-plate aspect-square p-3 md:p-4 flex items-end text-gray-900">
+    <span class="font-display font-black text-3xl md:text-4xl leading-[0.95] break-words line-clamp-4 group-hover:underline group-focus-visible:underline decoration-2"><%= product.name %></span>
+  </div>
+  <div class="flex items-baseline justify-between gap-2 mt-2">
+    <span class="text-sm text-gray-400"><%= product.category.name %></span>
+    <span class="font-display font-bold text-xl tabular-nums">$<%= number_with_precision(product.price, precision: 2) %></span>
+  </div>
+<% end %>
