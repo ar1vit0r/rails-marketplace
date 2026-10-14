@@ -40,3 +40,6 @@
 # Claude Code project config/instructions.
 /.claude/
 /CLAUDE.md
+
+# Local process notes.
+/roadmap.md
