@@ -21,6 +21,17 @@ RSpec.describe "Products", type: :request do
       expect(response.body).not_to include("Paperback")
     end
 
+    it "treats % in the search as a literal character" do
+      create(:product, name: "Desk Lamp")
+      get products_path(q: "%")
+      expect(response.body).not_to include("Desk Lamp")
+    end
+
+    it "does not crash on a non-string search param" do
+      get "/products?q[]=a"
+      expect(response).to have_http_status(:ok)
+    end
+
     it "shows an empty state with a way out of the filters" do
       get products_path(q: "no-such-product")
       expect(response.body).to include("No products found", "Clear filters")

@@ -14,6 +14,12 @@ RSpec.describe "Pages", type: :request do
       expect(response.body).to include("Gadgets", "Desk Lamp")
     end
 
+    it "hides out-of-stock products" do
+      create(:product, name: "Ghost Item", stock: 0)
+      get root_path
+      expect(response.body).not_to include("Ghost Item")
+    end
+
     it "shows an empty state without products" do
       get root_path
       expect(response.body).to include("No products yet")
