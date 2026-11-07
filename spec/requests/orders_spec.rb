@@ -18,6 +18,25 @@ RSpec.describe "Orders", type: :request do
       end
     end
 
+    context "when logged in with nothing orderable" do
+      before { sign_in user }
+
+      it "rejects an empty cart" do
+        expect { post orders_path }.not_to change(Order, :count)
+        expect(response).to redirect_to(cart_path)
+      end
+
+      it "rejects a cart that exceeds stock and creates nothing" do
+        product = create(:product, stock: 2)
+        post cart_add_path(product)
+        post cart_add_path(product)
+        product.update!(stock: 1)
+
+        expect { post orders_path }.not_to change { [ Order.count, OrderItem.count ] }
+        expect(response).to redirect_to(cart_path)
+      end
+    end
+
     context "when not logged in" do
       it "redirects to login" do
         post orders_path
