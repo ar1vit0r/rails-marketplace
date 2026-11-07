@@ -19,8 +19,7 @@ RSpec.describe "Checkout", type: :request do
 
         expect(response).to have_http_status(:see_other)
         expect(response.location).to eq("https://checkout.stripe.com/test")
-        expect(order.checkout_session).to be_present
-        expect(order.checkout_session.stripe_session_id).to eq("cs_test_123")
+        expect(order.checkout_sessions.pluck(:stripe_session_id)).to eq([ "cs_test_123" ])
       end
 
       it "keeps the earlier checkout session when the order is submitted twice" do

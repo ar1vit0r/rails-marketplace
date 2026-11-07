@@ -27,9 +27,7 @@ class CheckoutController < ApplicationController
       metadata: { order_id: @order.id }
     )
 
-    # Not @order.create_checkout_session!: has_one would destroy the earlier record,
-    # and a late webhook for that Stripe session would then find nothing to update.
-    CheckoutSession.create!(order: @order, stripe_session_id: session.id, status: "pending")
+    @order.checkout_sessions.create!(stripe_session_id: session.id, status: "pending")
 
     redirect_to session.url, allow_other_host: true, status: :see_other
   rescue Stripe::StripeError => e
