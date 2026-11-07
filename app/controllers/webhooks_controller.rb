@@ -44,5 +44,20 @@ class WebhooksController < ActionController::Base
     return if checkout.nil? || checkout.paid?
 
     checkout.update!(status: "expired")
+    cancel_abandoned_order(checkout.order)
+  end
+
+  # An order abandoned at checkout gives its stock back, unless another session is still open.
+  # The conditional update lets only one delivery of the event do the restore.
+  def cancel_abandoned_order(order)
+    return if order.checkout_sessions.where(status: %w[pending paid]).exists?
+
+    Order.transaction do
+      next unless Order.where(id: order.id, status: "pending").update_all(status: "cancelled").positive?
+
+      order.order_items.each do |item|
+        Product.where(id: item.product_id).update_all([ "stock = stock + ?", item.quantity ])
+      end
+    end
   end
 end

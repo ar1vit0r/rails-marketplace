@@ -64,6 +64,49 @@ RSpec.describe "Webhooks", type: :request do
       expect(checkout_session.reload.status).to eq("expired")
     end
 
+    context "when a checkout expires on a pending order" do
+      let(:product) { create(:product, stock: 3) }
+      let(:event) do
+        OpenStruct.new(
+          type: "checkout.session.expired",
+          data: OpenStruct.new(object: OpenStruct.new(id: "cs_test_123"))
+        )
+      end
+
+      before do
+        create(:order_item, order: order, product: product, quantity: 2, price: 10)
+        allow(Stripe::Webhook).to receive(:construct_event).and_return(event)
+      end
+
+      def send_expired
+        post webhooks_stripe_path,
+             params: "{}",
+             headers: { "CONTENT_TYPE" => "application/json", "HTTP_STRIPE_SIGNATURE" => "test_sig" }
+      end
+
+      it "cancels the order and gives its stock back" do
+        send_expired
+
+        expect(order.reload.status).to eq("cancelled")
+        expect(product.reload.stock).to eq(5)
+      end
+
+      it "restores stock only once when the event is replayed" do
+        2.times { send_expired }
+
+        expect(product.reload.stock).to eq(5)
+      end
+
+      it "keeps the order and stock while another checkout session is still open" do
+        create(:checkout_session, order: order, status: "pending")
+
+        send_expired
+
+        expect(order.reload.status).to eq("pending")
+        expect(product.reload.stock).to eq(3)
+      end
+    end
+
     it "does not let a late expired event overwrite a paid checkout" do
       checkout_session.update!(status: "paid")
       event = OpenStruct.new(

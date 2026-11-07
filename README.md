@@ -50,7 +50,7 @@ Paying an order goes through hosted Stripe Checkout:
 
 1. `CheckoutController#create` builds a Checkout Session from the order's items (USD) and stores a `CheckoutSession` record with status `pending`, then redirects to Stripe.
 2. Stripe redirects back to `/checkout/success` or `/checkout/cancel`.
-3. `POST /webhooks/stripe` verifies the `Stripe-Signature` header against `STRIPE_WEBHOOK_SECRET`. `checkout.session.completed` marks the checkout and the order `paid`; `checkout.session.expired` marks the checkout `expired`.
+3. `POST /webhooks/stripe` verifies the `Stripe-Signature` header against `STRIPE_WEBHOOK_SECRET`. `checkout.session.completed` marks the checkout and the order `paid`; `checkout.session.expired` marks the checkout `expired` and, when no other session for the order is still open, cancels the order and gives its stock back.
 
 Environment variables:
 
