@@ -10,7 +10,7 @@ A full-stack e-commerce marketplace built with Rails 8, featuring a shopping car
 - **Shopping cart** — Add/remove items, quantity tracking
 - **Order placement** — Checkout flow with order history
 - **Stripe payments** — Hosted Stripe Checkout with signature-verified webhooks that mark orders paid
-- **Admin dashboard** — Manage products, categories, and orders
+- **Admin dashboard** — Manage products and categories, with an order overview
 - **Multi-role auth** — Admin, seller, and regular user roles
 - **Pagination** — Server-side pagination via Pagy
 
@@ -20,7 +20,7 @@ A full-stack e-commerce marketplace built with Rails 8, featuring a shopping car
 |-------|------------|
 | Framework | Ruby on Rails 8.1 |
 | Language | Ruby 3.4 |
-| Database | SQLite (dev) / PostgreSQL (prod) |
+| Database | SQLite |
 | Auth | Devise 5.0 |
 | Payments | Stripe Checkout + webhooks |
 | Pagination | Pagy |
@@ -39,7 +39,7 @@ bin/rails db:create db:migrate db:seed
 bin/dev
 ```
 
-Open [http://localhost:3001](http://localhost:3001).
+Open [http://localhost:3000](http://localhost:3000).
 
 **Admin login:** `admin@example.com` / `password`
 **Seller login:** `seller@example.com` / `password`
@@ -63,7 +63,7 @@ To try it locally with the [Stripe CLI](https://docs.stripe.com/stripe-cli) and 
 
 ```bash
 export STRIPE_SECRET_KEY=sk_test_...
-stripe listen --forward-to localhost:3001/webhooks/stripe   # prints the whsec_... value for STRIPE_WEBHOOK_SECRET
+stripe listen --forward-to localhost:3000/webhooks/stripe   # prints the whsec_... value for STRIPE_WEBHOOK_SECRET
 ```
 
 Pay with the test card `4242 4242 4242 4242`, any future expiry and any CVC.
@@ -74,19 +74,16 @@ Pay with the test card `4242 4242 4242 4242`, any future expiry and any CVC.
 bundle exec rspec
 ```
 
-53 examples across model and request specs.
+Model, helper and request specs.
 
 ## Deployment
 
-Configured via `render.yaml` (Blueprints):
-
-1. Push to GitHub
-2. Connect Render → New Blueprint
-3. Auto-deploys on `main` branch push
+The app ships as a Docker image (multi-stage `Dockerfile`) and the live demo runs on Render.
+Kamal is configured in `config/deploy.yml` and `.kamal/` for deploying the same image to your own host.
 
 ## Skills Demonstrated
 
-MVC architecture, RESTful routing, ActiveRecord associations (7 models), Devise authentication, multi-role authorization, shopping cart implementation, order management, search/filter, pagination, database migrations, Docker containerization, CI/CD pipelines, and production deployment.
+MVC architecture, RESTful routing, ActiveRecord associations, Devise authentication, multi-role authorization, shopping cart implementation, order management, search/filter, pagination, database migrations, Docker containerization, CI/CD pipelines, and production deployment.
 
 ## License
 
