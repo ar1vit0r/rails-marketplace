@@ -36,12 +36,12 @@ class WebhooksController < ActionController::Base
       status: "paid",
       payment_intent_id: session.payment_intent
     )
-    checkout.order.update!(status: "paid")
+    checkout.order.update!(status: "paid") if checkout.order.pending?
   end
 
   def handle_checkout_expired(session)
     checkout = CheckoutSession.find_by(stripe_session_id: session.id)
-    return unless checkout
+    return if checkout.nil? || checkout.paid?
 
     checkout.update!(status: "expired")
   end

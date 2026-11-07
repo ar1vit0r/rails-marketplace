@@ -23,6 +23,40 @@ RSpec.describe "Checkout", type: :request do
         expect(order.checkout_session.stripe_session_id).to eq("cs_test_123")
       end
 
+      it "keeps the earlier checkout session when the order is submitted twice" do
+        order = create(:order, user: user, status: "pending", total: 25.00)
+        create(:order_item, order: order, product: product, price: 25.00, quantity: 1)
+        allow(Stripe::Checkout::Session).to receive(:create).and_return(
+          double(id: "cs_first", url: "https://checkout.stripe.com/1"),
+          double(id: "cs_second", url: "https://checkout.stripe.com/2")
+        )
+
+        post order_checkout_path(order)
+        post order_checkout_path(order)
+
+        expect(CheckoutSession.where(order: order).pluck(:stripe_session_id)).to contain_exactly("cs_first", "cs_second")
+      end
+
+      it "does not start checkout for a cancelled order" do
+        order = create(:order, user: user, status: "cancelled")
+        expect(Stripe::Checkout::Session).not_to receive(:create)
+
+        post order_checkout_path(order)
+
+        expect(response).to redirect_to(order)
+      end
+
+      it "redirects with an alert when Stripe fails" do
+        order = create(:order, user: user, status: "pending", total: 25.00)
+        create(:order_item, order: order, product: product, price: 25.00, quantity: 1)
+        allow(Stripe::Checkout::Session).to receive(:create).and_raise(Stripe::APIConnectionError.new("down"))
+
+        post order_checkout_path(order)
+
+        expect(response).to redirect_to(order)
+        expect(flash[:alert]).to be_present
+      end
+
       it "redirects if order is already paid" do
         order = create(:order, user: user, status: "paid")
 

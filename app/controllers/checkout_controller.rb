@@ -4,8 +4,8 @@ class CheckoutController < ApplicationController
   def create
     @order = current_user.orders.find(params[:order_id])
 
-    if @order.paid?
-      redirect_to @order, notice: "Order already paid."
+    unless @order.pending?
+      redirect_to @order, notice: @order.paid? ? "Order already paid." : "This order can no longer be paid."
       return
     end
 
@@ -27,12 +27,14 @@ class CheckoutController < ApplicationController
       metadata: { order_id: @order.id }
     )
 
-    @order.create_checkout_session!(
-      stripe_session_id: session.id,
-      status: "pending"
-    )
+    # Not @order.create_checkout_session!: has_one would destroy the earlier record,
+    # and a late webhook for that Stripe session would then find nothing to update.
+    CheckoutSession.create!(order: @order, stripe_session_id: session.id, status: "pending")
 
     redirect_to session.url, allow_other_host: true, status: :see_other
+  rescue Stripe::StripeError => e
+    Rails.logger.error("Stripe checkout failed for order #{@order.id}: #{e.message}")
+    redirect_to @order, alert: "Payment is unavailable right now. Please try again."
   end
 
   def success
