@@ -18,6 +18,32 @@ RSpec.describe "Orders", type: :request do
       end
     end
 
+    context "when logged in and stock is limited" do
+      before { sign_in user }
+
+      it "decrements stock by the ordered quantity" do
+        product = create(:product, stock: 5)
+        2.times { post cart_add_path(product) }
+
+        post orders_path
+
+        expect(product.reload.stock).to eq(3)
+      end
+
+      it "rolls back earlier decrements when a later line is out of stock" do
+        plenty = create(:product, stock: 5)
+        scarce = create(:product, stock: 2)
+        post cart_add_path(plenty)
+        2.times { post cart_add_path(scarce) }
+        scarce.update!(stock: 1)
+
+        expect { post orders_path }.not_to change(Order, :count)
+        expect(plenty.reload.stock).to eq(5)
+        expect(scarce.reload.stock).to eq(1)
+        expect(response).to redirect_to(cart_path)
+      end
+    end
+
     context "when logged in with nothing orderable" do
       before { sign_in user }
 
